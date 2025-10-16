@@ -1,0 +1,31 @@
+https://github.com/iStoreOS/iStoreOS
+
+配置为旁路由，/etc/config/network中要把eth3（wan口）加到lan里，否则网线只连接WAN口的时候无法上网
+
+一、ZeroTier网络配置好后，要执行两个命令
+
+错误点： MASQUERADE 规则绑定到了 ZeroTier 虚拟接口（ztyjklhdxp），导致从 ZeroTier 发出的流量被错误地进行了源地址伪装，而实际需要伪装的是 从局域网（LAN）出口的流量。
+# 删除错误规则
+iptables -t nat -D POSTROUTING -o ztyjklhdxp -j MASQUERADE
+
+# 添加正确规则（伪装LAN出口流量）
+iptables -t nat -A POSTROUTING -o br-lan -j MASQUERADE
+
+
+
+二、passwall安装。
+opkg install luci-app-passwall
+opkg install luci-i18n-passwall-zh-cn
+
+
+
+三、安装openssh-sftp-server使winscp软件能登录
+opkg update
+  opkg install openssh-sftp-server
+  /etc/init.d/sshd restart
+
+四、安装tailscale内网穿透，传说速度比ZeroTier快
+
+
+
+五、在github下载openclash安装文件，安装依赖再安装openclash，下载内核core文件再安装
